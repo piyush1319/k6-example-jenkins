@@ -1,9 +1,12 @@
 #!/bin/bash
 set -ex
 
-sudo apt-get update
-sudo apt-get install dirmngr --install-recommends
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
-echo "deb https://dl.bintray.com/loadimpact/deb stable main" | sudo tee -a /etc/apt/sources.list
-sudo apt-get update
-sudo apt-get install k6
+if ! k6 version &> /dev/null
+then
+  echo "[setup] installing k6 ..."
+  gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+  echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | tee /etc/apt/sources.list.d/k6.list
+  apt-get update
+  apt-get install k6
+  exit
+fi
